@@ -38,9 +38,16 @@ FROM
     country
 WHERE
     country IN ('Afghanistan' , 'Bangladesh', 'China');
+    
 -- 3a. You want to keep a description of each actor. You don't think you will be performing queries on a description, so create a column in the table actor named description and use the data type BLOB (Make sure to research the type BLOB, as the difference between it and VARCHAR are significant).
 
+ALTER TABLE `sakila`.`actor` 
+ADD COLUMN `description` BLOB NULL AFTER `last_update`;
 -- 3b. Very quickly you realize that entering descriptions for each actor is too much effort. Delete the description column.
+
+ALTER TABLE `sakila`.`actor` 
+DROP COLUMN `description`;
+
 -- 4a. List the last names of actors, as well as how many actors have that last name.
 SELECT 
     last_name, COUNT(*) AS Count
@@ -124,29 +131,176 @@ FROM
     inventory i ON f.film_id = i.film_id
 WHERE
     title = 'Hunchback Impossible';
+    
 -- 6e. Using the tables payment and customer and the JOIN command, list the total paid by each customer. List the customers alphabetically by last name:
 
 SELECT 
-    c.last_name, SUM(p.amount)
+    c.first_name, c.last_name, SUM(p.amount)
 FROM
     customer c
         JOIN
     payment p ON c.customer_id = p.customer_id
-GROUP BY c.last_name
-ORDER BY c.last_name DESC;
+GROUP BY c.first_name,c.last_name
+ORDER BY c.last_name ASC;
 
 
 
 -- 7a. The music of Queen and Kris Kristofferson have seen an unlikely resurgence. As an unintended consequence, films starting with the letters K and Q have also soared in popularity. Use subqueries to display the titles of movies starting with the letters K and Q whose language is English.
+SELECT 
+    title
+FROM
+    film
+WHERE
+    (title LIKE 'K%' OR title LIKE 'Q%')
+        AND language_id IN (SELECT 
+            language_id
+        FROM
+            language
+        WHERE
+            name = 'English');
+            
 
-
--- 7b. Use subqueries to display all actors who appear in the film Alone Trip.
+-- 7b. Use subqueries to display all actors who appear in the film Alone Trip
+SELECT 
+    first_name, last_name
+FROM
+    actor
+WHERE
+    actor_id IN (SELECT 
+            actor_id
+        FROM
+            film_actor
+        WHERE
+            film_id IN (SELECT 
+                    film_id
+                FROM
+                    film
+                WHERE
+                    title = 'Alone Trip'));
+                    
+                    
 -- 7c. You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers. Use joins to retrieve this information.
+
+SELECT 
+    first_name, last_name, email
+FROM
+    customer cus
+        INNER JOIN
+    address a ON cus.address_id = a.address_id
+        INNER JOIN
+    city c ON a.city_id = c.city_id
+        INNER JOIN
+    country co ON c.country_id = co.country_id
+WHERE
+    co.country = 'Canada';
+
+
 -- 7d. Sales have been lagging among young families, and you wish to target all family movies for a promotion. Identify all movies categorized as family films.
+
+SELECT 
+    title
+FROM
+    film f
+        INNER JOIN
+    film_category fc ON f.film_id = fc.film_id
+        INNER JOIN
+    category ct ON ct.category_id = fc.category_id
+WHERE
+    ct.name = 'Family';
+    
+    
 -- 7e. Display the most frequently rented movies in descending order.
+
+SELECT 
+    f.title, COUNT(*) AS NoOfTimesRented
+FROM
+    film f
+        LEFT JOIN
+    inventory inv ON inv.film_id = f.film_id
+        INNER JOIN
+    rental r ON inv.inventory_id = r.inventory_id
+GROUP BY f.title
+ORDER BY NoOfTimesRented DESC;
+
+
+
 -- 7f. Write a query to display how much business, in dollars, each store brought in.
+
+SELECT 
+    store.store_id, SUM(p.amount) AS Revenue
+FROM
+    payment p
+        INNER JOIN
+    staff staff ON staff.staff_id = p.staff_id
+        INNER JOIN
+    store ON store.store_id = staff.store_id
+GROUP BY store.store_id;
+
+
 -- 7g. Write a query to display for each store its store ID, city, and country.
+
+SELECT 
+    store.store_id, city.city, country.country
+FROM
+    store
+        INNER JOIN
+    address ON address.address_id = store.address_id
+        INNER JOIN
+    city ON city.city_id = address.city_id
+        INNER JOIN
+    country ON country.country_id = city.country_id;
+
+
 -- 7h. List the top five genres in gross revenue in descending order. (Hint: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
+
+SELECT 
+    category.name, SUM(payment.amount) AS GrossRevenue
+FROM
+    category
+        INNER JOIN
+    film_category ON film_category.category_id = category.category_id
+        INNER JOIN
+    inventory ON inventory.film_id = film_category.film_id
+        INNER JOIN
+    rental ON rental.inventory_id = inventory.inventory_id
+        INNER JOIN
+    payment ON payment.rental_id = rental.rental_id
+GROUP BY category.name
+ORDER BY GrossRevenue DESC
+LIMIT 5;
+
+
 -- 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
+
+create view Gross_Revenue_by_Genres as SELECT 
+    category.name, SUM(payment.amount) AS GrossRevenue
+FROM
+    category
+        INNER JOIN
+    film_category ON film_category.category_id = category.category_id
+        INNER JOIN
+    inventory ON inventory.film_id = film_category.film_id
+        INNER JOIN
+    rental ON rental.inventory_id = inventory.inventory_id
+        INNER JOIN
+    payment ON payment.rental_id = rental.rental_id
+GROUP BY category.name
+ORDER BY GrossRevenue DESC
+LIMIT 5;
+
 -- 8b. How would you display the view that you created in 8a?
+
+SELECT TABLE_NAME FROM information_schema.`TABLES` WHERE TABLE_TYPE LIKE 'VIEW' AND TABLE_SCHEMA LIKE 'sakila';
+
+select * from Gross_Revenue_by_Genres;
+ 
 -- 8c. You find that you no longer need the view top_five_genres. Write a query to delete it.
+
+DROP VIEW IF EXISTS Gross_Revenue_by_Genres;
+
+
+
+
+
+
+
