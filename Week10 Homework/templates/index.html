@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hawaii Climate Analysis API</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+</head>
+
+<body>
+    <h1>Welcome to Hawaii Climate Analysis API !!</h1>
+    <div class="list-group">
+        <a href="/api/v1.0/precipitation" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">/api/v1.0/precipitation</h5>
+            </div>
+            <p class="mb-1">Query for the dates and temperature observations from the last year. Convert the query results to a Dictionary using date as the key and tobs as the value. Return the JSON representation of your dictionary.</p>
+        </a>
+        <a href="/api/v1.0/stations" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">/api/v1.0/stations</h5>
+            </div>
+            <p class="mb-1">Return a JSON list of stations from the dataset.</p>
+        </a>
+        <a href="/api/v1.0/tobs" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">/api/v1.0/tobs</h5>
+            </div>
+            <p class="mb-1">Return a JSON list of Temperature Observations (tobs) for the previous year.</p>
+        </a>
+        <a href="/api/v1.0/temp/start/end" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">/api/v1.0/temp/start/end</h5>
+            </div>
+            <p class="mb-1">Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range. When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date. When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.</p>
+        </a>
+    </div>
+</body>
+
+</html>
